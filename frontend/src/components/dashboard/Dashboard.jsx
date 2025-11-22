@@ -15,7 +15,11 @@ import InventoryAlerts from './InventoryAlerts'
 import PerformanceMetrics from './PerformanceMetrics'
 import RecentTransactions from './RecentTransactions'
 import QuickStats from './QuickStats'
-import ExportButton from './ExportButton' // 🆕 ADD THIS IMPORT
+import ExportButton from './ExportButton'
+// 🆕 IMPORT THE 3 NEW COMPONENTS
+import RealNotifications from './RealNotifications'
+import QuickAddWidget from './QuickAddWidget'
+import RealCharts from './RealCharts'
 
 const Dashboard = () => {
   const [stats, setStats] = useState({})
@@ -109,7 +113,7 @@ const Dashboard = () => {
               <span>Refresh</span>
             </button>
             
-            {/* 🆕 EXPORT BUTTON */}
+            {/* Export Button */}
             <ExportButton />
             
             <NotificationBell />
@@ -130,8 +134,14 @@ const Dashboard = () => {
         {/* NEW: Performance Metrics */}
         <PerformanceMetrics />
         
+        {/* 🆕 REPLACE OLD INVENTORY CHART WITH REAL CHARTS */}
         <div className="mt-6">
-          <InventoryChart />
+          <RealCharts products={products} />
+        </div>
+        
+        {/* 🆕 ADD REAL NOTIFICATIONS SECTION */}
+        <div className="mt-6">
+          <RealNotifications />
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
@@ -148,6 +158,9 @@ const Dashboard = () => {
           <RecentTransactions />
         </div>
       </div>
+      
+      {/* 🆕 ADD QUICK ADD WIDGET (FLOATING BUTTON) */}
+      <QuickAddWidget />
     </div>
   )
 }
