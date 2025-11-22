@@ -1,5 +1,8 @@
 # 🏪 InventoryMaster - Modern Inventory Management System
 
+
+#Video Link : https://drive.google.com/file/d/106h7L2Kr8Gg-8F0l3m1B4xzaMmj-mcIe/view?usp=sharing
+
 A full-stack inventory management system built with React, Node.js, Express, and SQLite. Designed to streamline inventory operations with a beautiful, responsive interface.
 
 ![InventoryMaster Dashboard](https://img.shields.io/badge/InventoryMaster-Ready-brightgreen)
