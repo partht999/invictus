@@ -15,6 +15,7 @@ import InventoryAlerts from './InventoryAlerts'
 import PerformanceMetrics from './PerformanceMetrics'
 import RecentTransactions from './RecentTransactions'
 import QuickStats from './QuickStats'
+import ExportButton from './ExportButton' // 🆕 ADD THIS IMPORT
 
 const Dashboard = () => {
   const [stats, setStats] = useState({})
@@ -22,13 +23,13 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true)
   const [recentActivity, setRecentActivity] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
-  const [lastUpdated, setLastUpdated] = useState(new Date()) // 🆕 ADD THIS LINE
+  const [lastUpdated, setLastUpdated] = useState(new Date())
   const navigate = useNavigate()
 
   useEffect(() => {
     fetchDashboardData()
     
-    // 🆕 ADD AUTO-REFRESH (every 30 seconds)
+    // Auto-refresh (every 30 seconds)
     const interval = setInterval(fetchDashboardData, 30000)
     
     return () => clearInterval(interval) // Cleanup on unmount
@@ -38,7 +39,7 @@ const Dashboard = () => {
     try {
       setLoading(true)
       const token = localStorage.getItem('token')
-      
+      await new Promise(resolve => setTimeout(resolve, 1500)) 
       const statsResponse = await axios.get('http://localhost:5000/api/dashboard/stats', {
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -59,11 +60,11 @@ const Dashboard = () => {
       console.error('Error fetching dashboard data:', error)
     } finally {
       setLoading(false)
-      setLastUpdated(new Date()) // 🆕 UPDATE TIMESTAMP
+      setLastUpdated(new Date())
     }
   }
 
-  // 🆕 ADD MANUAL REFRESH FUNCTION
+  // Manual refresh function
   const handleRefresh = () => {
     fetchDashboardData()
   }
@@ -87,16 +88,16 @@ const Dashboard = () => {
       <Header onLogout={logout} />
       
       <div className="p-6 max-w-7xl mx-auto">
-        {/* 🆕 UPDATE HEADER SECTION */}
+        {/* Updated Header Section */}
         <div className="flex justify-between items-start mb-8">
           <div>
             <h1 className="text-3xl font-bold text-[#00072D] mb-2">Dashboard Overview</h1>
             <p className="text-slate-600">
-              Welcome back! Last updated: {lastUpdated.toLocaleTimeString()} {/* 🆕 ADD TIMESTAMP */}
+              Welcome back! Last updated: {lastUpdated.toLocaleTimeString()}
             </p>
           </div>
           <div className="flex items-center space-x-4">
-            {/* 🆕 ADD REFRESH BUTTON */}
+            {/* Refresh Button */}
             <button
               onClick={handleRefresh}
               disabled={loading}
@@ -107,6 +108,10 @@ const Dashboard = () => {
               </svg>
               <span>Refresh</span>
             </button>
+            
+            {/* 🆕 EXPORT BUTTON */}
+            <ExportButton />
+            
             <NotificationBell />
           </div>
         </div>
