@@ -2,6 +2,26 @@ import React, { useState } from 'react'
 
 const ExportButton = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const [snackbar, setSnackbar] = useState({ open: false, message: "" })
+
+  const showSnackbar = (msg) => {
+    setSnackbar({ open: true, message: msg })
+
+    setTimeout(() => {
+      setSnackbar({ open: false, message: "" })
+    }, 3000)
+  }
+
+  const handleExport = (format) => {
+    setIsOpen(false)
+
+    // Simulate download
+    setTimeout(() => {
+      showSnackbar(`${format} downloaded successfully!`)
+    }, 700)
+
+    // In real app: trigger file generation/download
+  }
 
   const exportOptions = [
     {
@@ -12,7 +32,7 @@ const ExportButton = () => {
       onClick: () => handleExport('PDF')
     },
     {
-      format: 'CSV', 
+      format: 'CSV',
       icon: '📊',
       label: 'CSV Data',
       description: 'Raw data for analysis',
@@ -26,21 +46,6 @@ const ExportButton = () => {
       onClick: () => handleExport('Excel')
     }
   ]
-
-  const handleExport = (format) => {
-    setIsOpen(false)
-    
-    // Simulate export process
-    console.log(`Exporting as ${format}...`)
-    
-    // Show success message
-    alert(`📤 Exporting dashboard data as ${format}...\n(This would download a file in real implementation)`)
-    
-    // In real implementation, you would:
-    // - Generate PDF using libraries like jsPDF
-    // - Create CSV/Excel files and trigger download
-    // - Call backend API for report generation
-  }
 
   return (
     <div className="relative">
@@ -64,7 +69,7 @@ const ExportButton = () => {
               <p className="text-xs text-slate-500">Choose export format</p>
             </div>
             
-            {exportOptions.map((option, index) => (
+            {exportOptions.map((option) => (
               <button
                 key={option.format}
                 onClick={option.onClick}
@@ -84,6 +89,26 @@ const ExportButton = () => {
           </div>
         </div>
       )}
+
+      {/* Snackbar */}
+      {snackbar.open && (
+        <div className="fixed bottom-6 right-6 bg-[#00072D] text-white px-5 py-3 rounded-xl shadow-lg animate-fade-up">
+          {snackbar.message}
+        </div>
+      )}
+
+      {/* Snackbar Animation */}
+      <style>
+        {`
+          .animate-fade-up {
+            animation: fadeUp 0.3s ease-out;
+          }
+          @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}
+      </style>
     </div>
   )
 }
