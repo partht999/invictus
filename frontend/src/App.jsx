@@ -1,8 +1,8 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Login from './components/Login'
-import Dashboard from './components/Dashboard'
-import ProductList from './components/ProductList'
+import Login from "./components/auth/Login";
+import Dashboard from "./components/dashboard/Dashboard";
+import ProductList from "./components/products/ProductList";
 
 function App() {
   return (
