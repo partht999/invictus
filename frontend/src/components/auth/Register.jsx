@@ -1,6 +1,7 @@
 // src/components/auth/Register.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -21,6 +22,7 @@ const Register = () => {
     special: false
   });
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -97,16 +99,20 @@ const Register = () => {
 
     // MOCK REGISTRATION - No backend needed!
     setTimeout(() => {
-      localStorage.setItem('token', 'mock-token-' + Date.now());
-      localStorage.setItem('user', JSON.stringify({
+      // Set authentication data using AuthContext
+      const mockUser = {
         name: formData.name,
         email: formData.email,
         role: formData.email.includes('admin') ? 'admin' : 'manager'
-      }));
-      localStorage.setItem('loginTime', new Date().getTime().toString());
+      };
+      const token = 'mock-token-' + Date.now();
+      login(mockUser, token);
       
-      navigate('/dashboard');
+      // Update loading state
       setLoading(false);
+      
+      // Navigate to dashboard immediately after setting auth data
+      navigate('/dashboard', { replace: true });
     }, 1000);
   };
 

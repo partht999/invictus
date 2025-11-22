@@ -1,6 +1,7 @@
 // src/components/auth/Login.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setFormData({
@@ -61,12 +63,18 @@ const Login = () => {
         lastLogin: new Date().toISOString()
       };
       
-      localStorage.setItem('token', 'mock-jwt-token-' + Date.now());
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      localStorage.setItem('loginTime', new Date().getTime().toString());
+      // Set authentication data using AuthContext
+      const token = 'mock-jwt-token-' + Date.now();
+      login(mockUser, token);
       
-      navigate('/dashboard');
+      console.log('Login successful, token set:', token);
+      console.log('Navigating to /dashboard');
+      
+      // Update loading state
       setLoading(false);
+      
+      // Navigate to dashboard immediately after setting auth data
+      navigate('/dashboard', { replace: true });
     }, 1000);
   };
 

@@ -3,14 +3,16 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Login from "./components/auth/Login";
-import Register from "./components/auth/Register"; // ← ADD THIS IMPORT
+import Register from "./components/auth/Register";
 import Dashboard from "./components/dashboard/Dashboard";
-import ProductList from "./components/products/ProductList";
+import ProductsPage from "./pages/ProductsPage";
 import Layout from './components/Layout';
+import AutoLogout from './components/AutoLogout';
 
 // Protected Route Component
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, requiredRole }) => {
   const token = localStorage.getItem('token');
+  // Add role checking logic here if needed
   return token ? children : <Navigate to="/" />;
 };
 
@@ -20,7 +22,6 @@ const PublicRoute = ({ children }) => {
   return !token ? children : <Navigate to="/dashboard" />;
 };
 
-// Update your App.jsx with enhanced routes
 function App() {
   return (
     <AuthProvider>
@@ -38,17 +39,10 @@ function App() {
             </ProtectedRoute>
           } />
           
-          {/* Admin-only routes */}
-          <Route path="/admin" element={
-            <ProtectedRoute requiredRole="admin">
-              <Layout><AdminPanel /></Layout>
-            </ProtectedRoute>
-          } />
-
-          {/* Manager routes */}
+          {/* Products Management Route - Using new ProductsPage */}
           <Route path="/products" element={
-            <ProtectedRoute requiredRole="manager">
-              <Layout><ProductList /></Layout>
+            <ProtectedRoute>
+              <Layout><ProductsPage /></Layout>
             </ProtectedRoute>
           } />
 
