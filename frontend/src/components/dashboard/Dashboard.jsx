@@ -10,7 +10,11 @@ import InventoryChart from './InventoryChart'
 import LowStockPanel from './LowStockPanel'
 import NotificationBell from './NotificationBell'
 import DashboardSearch from './DashboardSearch'
-// REMOVE THIS LINE: import MobileNav from './MobileNav'
+// Import new features
+import InventoryAlerts from './InventoryAlerts'
+import PerformanceMetrics from './PerformanceMetrics'
+import RecentTransactions from './RecentTransactions'
+import QuickStats from './QuickStats'
 
 const Dashboard = () => {
   const [stats, setStats] = useState({})
@@ -18,35 +22,33 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true)
   const [recentActivity, setRecentActivity] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [lastUpdated, setLastUpdated] = useState(new Date()) // 🆕 ADD THIS LINE
   const navigate = useNavigate()
 
   useEffect(() => {
     fetchDashboardData()
+    
+    // 🆕 ADD AUTO-REFRESH (every 30 seconds)
+    const interval = setInterval(fetchDashboardData, 30000)
+    
+    return () => clearInterval(interval) // Cleanup on unmount
   }, [])
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true)
-      
-      // ⏰ ADD THIS DELAY TO SEE LOADING SKELETON
-    await new Promise(resolve => setTimeout(resolve, 2000)) // 3 second delay
-    
-
       const token = localStorage.getItem('token')
       
-      // Fetch stats
       const statsResponse = await axios.get('http://localhost:5000/api/dashboard/stats', {
         headers: { Authorization: `Bearer ${token}` }
       })
       setStats(statsResponse.data)
       
-      // Fetch products for LowStockPanel
       const productsResponse = await axios.get('http://localhost:5000/api/products', {
         headers: { Authorization: `Bearer ${token}` }
       })
       setProducts(productsResponse.data)
       
-      // Mock data for recent activity
       setRecentActivity([
         { id: 1, type: 'receipt', product: 'Steel Rods', quantity: 50, timestamp: new Date().toISOString() },
         { id: 2, type: 'delivery', product: 'Wood Planks', quantity: 20, timestamp: new Date().toISOString() },
@@ -57,7 +59,13 @@ const Dashboard = () => {
       console.error('Error fetching dashboard data:', error)
     } finally {
       setLoading(false)
+      setLastUpdated(new Date()) // 🆕 UPDATE TIMESTAMP
     }
+  }
+
+  // 🆕 ADD MANUAL REFRESH FUNCTION
+  const handleRefresh = () => {
+    fetchDashboardData()
   }
 
   const handleSearch = (term) => {
@@ -75,49 +83,66 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* REMOVE pb-20 md:pb-0 since no mobile nav */}
+    <div className="min-h-screen bg-[#F8FAFC]">
       <Header onLogout={logout} />
       
       <div className="p-6 max-w-7xl mx-auto">
-        {/* Welcome Header with Notification Bell */}
+        {/* 🆕 UPDATE HEADER SECTION */}
         <div className="flex justify-between items-start mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard Overview</h1>
-            <p className="text-gray-600">Welcome back! Here's what's happening with your inventory today.</p>
+            <h1 className="text-3xl font-bold text-[#00072D] mb-2">Dashboard Overview</h1>
+            <p className="text-slate-600">
+              Welcome back! Last updated: {lastUpdated.toLocaleTimeString()} {/* 🆕 ADD TIMESTAMP */}
+            </p>
           </div>
-          <NotificationBell />
+          <div className="flex items-center space-x-4">
+            {/* 🆕 ADD REFRESH BUTTON */}
+            <button
+              onClick={handleRefresh}
+              disabled={loading}
+              className="flex items-center space-x-2 bg-[#84eab3] text-[#00072D] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#84eab3]/80 transition-colors disabled:opacity-50"
+            >
+              <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Refresh</span>
+            </button>
+            <NotificationBell />
+          </div>
         </div>
         
-        {/* Search Bar */}
         <DashboardSearch onSearch={handleSearch} />
         
-        {/* Low Stock Alerts */}
-        <LowStockPanel products={products} />
+        {/* NEW: Quick Stats at the top */}
+        <QuickStats stats={stats} />
         
-        {/* Stats Cards */}
+        {/* NEW: Inventory Alerts - shows critical stock issues */}
+        <InventoryAlerts products={products} />
+        
+        <LowStockPanel products={products} />
         <StatsCards stats={stats} />
         
-        {/* Inventory Chart */}
+        {/* NEW: Performance Metrics */}
+        <PerformanceMetrics />
+        
         <div className="mt-6">
           <InventoryChart />
         </div>
         
-        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-          {/* Quick Actions */}
           <div className="lg:col-span-2">
             <QuickActions />
           </div>
-          
-          {/* Recent Activity */}
           <div className="lg:col-span-1">
             <RecentActivity activities={recentActivity} />
           </div>
         </div>
+        
+        {/* NEW: Recent Transactions Table */}
+        <div className="mt-6">
+          <RecentTransactions />
+        </div>
       </div>
-      
-      {/* REMOVE THIS LINE: <MobileNav /> */}
     </div>
   )
 }

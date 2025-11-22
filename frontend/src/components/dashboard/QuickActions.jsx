@@ -10,55 +10,43 @@ const QuickActions = () => {
       description: 'Add, edit or view products',
       icon: '📦',
       onClick: () => navigate('/products'),
-      color: 'from-blue-500 to-blue-600',
-      bgColor: 'bg-blue-50',
-      textColor: 'text-blue-700'
+      // PRIMARY BUTTON: Blue background, white text
+      style: 'bg-[#00072D] text-white hover:bg-[#00072D]/80'
     },
     {
       title: 'Receive Stock',
       description: 'Record incoming inventory',
       icon: '📥',
       onClick: () => navigate('/receipts'),
-      color: 'from-green-500 to-green-600',
-      bgColor: 'bg-green-50',
-      textColor: 'text-green-700'
+      // SECONDARY BUTTON: Green background, blue text  
+      style: 'bg-[#84eab3] text-[#00072D] hover:bg-[#84eab3]/80'
     },
     {
       title: 'Ship Orders',
       description: 'Process outgoing deliveries',
       icon: '📤',
       onClick: () => navigate('/deliveries'),
-      color: 'from-orange-500 to-orange-600',
-      bgColor: 'bg-orange-50',
-      textColor: 'text-orange-700'
+      // OUTLINED BUTTON: Green border, green text
+      style: 'border border-[#84eab3] text-[#84eab3] hover:bg-[#84eab3]/10'
     }
   ]
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
-        <span className="text-sm text-gray-500">Frequently used</span>
-      </div>
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+      <h3 className="text-lg font-semibold text-[#00072D] mb-6">Quick Actions</h3>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {actions.map((action, index) => (
           <button
             key={index}
             onClick={action.onClick}
-            className={`${action.bgColor} p-4 rounded-xl text-left transition-all duration-200 hover:shadow-md border border-transparent hover:border-gray-200 group`}
+            className={`${action.style} rounded-lg p-6 text-left transition-colors duration-200 font-medium flex flex-col items-start min-h-[120px] justify-between`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-2xl">{action.icon}</span>
-              <div className={`w-8 h-8 bg-gradient-to-r ${action.color} rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200`}>
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
+            <div className="text-2xl">{action.icon}</div>
+            <div className="w-full">
+              <h4 className="font-semibold text-base mb-2">{action.title}</h4>
+              <p className="text-sm opacity-90">{action.description}</p>
             </div>
-            
-            <h4 className={`font-semibold ${action.textColor} mb-1`}>{action.title}</h4>
-            <p className="text-sm text-gray-600">{action.description}</p>
           </button>
         ))}
       </div>
