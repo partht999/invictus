@@ -1,54 +1,101 @@
 // src/App.jsx
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { InventoryProvider } from "./context/InventoryContext";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import Dashboard from "./components/dashboard/Dashboard";
 import ProductsPage from "./pages/ProductsPage";
-import Layout from './components/Layout';
-import AutoLogout from './components/AutoLogout';
+import ReceiptsPage from "./pages/ReceiptsPage";
+import DeliveriesPage from "./pages/DeliveriesPage";
+import AutoLogout from "./components/AutoLogout";
 
-// Protected Route Component
-const ProtectedRoute = ({ children, requiredRole }) => {
-  const token = localStorage.getItem('token');
-  // Add role checking logic here if needed
-  return token ? children : <Navigate to="/" />;
+// ---- Protected Route Component ----
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+  return token ? children : <Navigate to="/" replace />;
 };
 
-// Public Route Component (redirect to dashboard if already logged in)
+// ---- Public Route (redirect if logged in) ----
 const PublicRoute = ({ children }) => {
-  const token = localStorage.getItem('token');
-  return !token ? children : <Navigate to="/dashboard" />;
+  const token = localStorage.getItem("token");
+  return !token ? children : <Navigate to="/dashboard" replace />;
 };
 
 function App() {
   return (
     <AuthProvider>
-      <AutoLogout />
-      <Router>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
-          <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+      <InventoryProvider>
+        <AutoLogout />
+        <Router>
+          <div className="min-h-screen bg-gray-100">
 
-          {/* Protected Routes */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Layout><Dashboard /></Layout>
-            </ProtectedRoute>
-          } />
-          
-          {/* Products Management Route - Using new ProductsPage */}
-          <Route path="/products" element={
-            <ProtectedRoute>
-              <Layout><ProductsPage /></Layout>
-            </ProtectedRoute>
-          } />
+            <Routes>
 
-          <Route path="*" element={<Navigate to="/dashboard" />} />
-        </Routes>
-      </Router>
+              {/* PUBLIC ROUTES */}
+              <Route
+                path="/"
+                element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <PublicRoute>
+                    <Register />
+                  </PublicRoute>
+                }
+              />
+
+            {/* PROTECTED ROUTES */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/products"
+              element={
+                <ProtectedRoute>
+                  <ProductsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/receipts"
+              element={
+                <ProtectedRoute>
+                  <ReceiptsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/deliveries"
+              element={
+                <ProtectedRoute>
+                  <DeliveriesPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* If no route matches → go to dashboard */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
+            </Routes>
+
+          </div>
+        </Router>
+      </InventoryProvider>
     </AuthProvider>
   );
 }
