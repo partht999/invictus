@@ -2,9 +2,10 @@ import express from 'express';
 import db from '../database.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import authenticateToken from '../middleware/auth.js';
 
 const router = express.Router();
-const JWT_SECRET = 'hackathon-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'hackathon-secret-key';
 
 // Register
 router.post('/register', async (req, res) => {
@@ -37,6 +38,16 @@ router.post('/login', (req, res) => {
     
     const token = jwt.sign({ userId: user.id }, JWT_SECRET);
     res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
+  });
+});
+
+// Verify token endpoint
+router.get('/verify', authenticateToken, (req, res) => {
+  db.get('SELECT id, name, email FROM users WHERE id = ?', [req.user.userId], (err, user) => {
+    if (err || !user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ user });
   });
 });
 

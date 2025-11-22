@@ -35,6 +35,7 @@ db.serialize(() => {
     supplier_name TEXT NOT NULL,
     product_id INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
+    notes TEXT,
     status TEXT DEFAULT 'completed',
     date DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES products (id)
@@ -46,10 +47,19 @@ db.serialize(() => {
     customer_name TEXT NOT NULL,
     product_id INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
+    notes TEXT,
     status TEXT DEFAULT 'completed',
     date DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES products (id)
   )`);
+
+  // Create indexes for better query performance
+  db.run(`CREATE INDEX IF NOT EXISTS idx_products_sku ON products(sku)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_products_category ON products(category)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_receipts_product ON receipts(product_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_receipts_date ON receipts(date)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_deliveries_product ON deliveries(product_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_deliveries_date ON deliveries(date)`);
 
   console.log('✅ Database tables created successfully');
 });
