@@ -1,57 +1,99 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-// import StatsCards from './StatsCards'
-// import Header from './Header'
+import StatsCards from './StatsCards'
+import Header from './Header'
+import QuickActions from './QuickActions'
+import RecentActivity from './RecentActivity'
 
 const Dashboard = () => {
   const [stats, setStats] = useState({})
+  const [loading, setLoading] = useState(true)
+  const [recentActivity, setRecentActivity] = useState([])
   const navigate = useNavigate()
 
-  // ... keep the rest of your Dashboard code
-  
-  return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Temporary header */}
-      <header className="bg-white shadow p-4">
-        <h1 className="text-xl font-bold">StockMaster - Dashboard</h1>
-      </header>
+  useEffect(() => {
+    fetchDashboardData()
+  }, [])
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true)
+      const token = localStorage.getItem('token')
       
-      <div className="p-6">
-        <h1 className="text-3xl font-bold mb-8">StockMaster Dashboard</h1>
-        
-        {/* Temporary stats display */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold">Total Products</h3>
-            <p className="text-3xl font-bold text-blue-600">{stats.totalProducts || 0}</p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold">Low Stock Items</h3>
-            <p className="text-3xl font-bold text-red-600">{stats.lowStockItems || 0}</p>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold">Total Stock</h3>
-            <p className="text-3xl font-bold text-green-600">{stats.totalStock || 0}</p>
+      // Fetch stats
+      const statsResponse = await axios.get('http://localhost:5000/api/dashboard/stats', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      setStats(statsResponse.data)
+      
+      // Fetch recent activity (you'll need to create this API endpoint)
+      // const activityResponse = await axios.get('http://localhost:5000/api/activity', {
+      //   headers: { Authorization: `Bearer ${token}` }
+      // })
+      // setRecentActivity(activityResponse.data)
+      
+      // Mock data for now
+      setRecentActivity([
+        { id: 1, type: 'receipt', product: 'Steel Rods', quantity: 50, timestamp: new Date().toISOString() },
+        { id: 2, type: 'delivery', product: 'Wood Planks', quantity: 20, timestamp: new Date().toISOString() },
+        { id: 3, type: 'receipt', product: 'Aluminum Sheets', quantity: 100, timestamp: new Date().toISOString() }
+      ])
+      
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const logout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    navigate('/')
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        <Header onLogout={logout} />
+        <div className="p-6">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="bg-white p-6 rounded-xl shadow-sm h-32"></div>
+              ))}
+            </div>
           </div>
         </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <Header onLogout={logout} />
+      
+      <div className="p-6 max-w-7xl mx-auto">
+        {/* Welcome Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard Overview</h1>
+          <p className="text-gray-600">Welcome back! Here's what's happening with your inventory today.</p>
+        </div>
         
-        {/* Quick Actions */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-xl font-semibold mb-4">Quick Actions</h3>
-          <div className="flex gap-4">
-            <button
-              onClick={() => navigate('/products')}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Manage Products
-            </button>
-            <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-              Add Receipt
-            </button>
-            <button className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
-              Add Delivery
-            </button>
+        {/* Stats Cards */}
+        <StatsCards stats={stats} />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          {/* Quick Actions */}
+          <div className="lg:col-span-2">
+            <QuickActions />
+          </div>
+          
+          {/* Recent Activity */}
+          <div className="lg:col-span-1">
+            <RecentActivity activities={recentActivity} />
           </div>
         </div>
       </div>
